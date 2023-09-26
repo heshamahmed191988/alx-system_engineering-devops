@@ -1,8 +1,20 @@
-# install nginx
-exec {'/usr/bin/env apt-get -y update': }
-exec {'/usr/bin/env apt-get -y install nginx': }
-exec {'/usr/bin/env echo "Hello World!" > /var/www/html/index.nginx-debian.html': }
-exec {'/usr/bin/env sed -i "/server_name _;/ a\\\trewrite ^/redirect_me http://www.Hello World!.com permanent;" /etc/nginx/sites-available/default': }
-exec {'/usr/bin/env sed -i "/server_name _;/ a\\\terror_page 404 /custom_404.html;" /etc/nginx/sites-available/default': }
-exec {'/usr/bin/env echo "Ceci n\'est pas une page" > /var/www/html/custom_404.html': }
-exec {'/usr/bin/env service nginx start': }
+# Install Nginx web server (w/ Puppet)
+package { 'nginx':
+  ensure => installed,
+}
+
+file_line { 'aaaaa':
+  ensure => 'present',
+  path   => '/etc/nginx/sites-available/default',
+  after  => 'listen 80 default_server;',
+  line   => 'rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;',
+}
+
+file { '/var/www/html/index.html':
+  content => 'Hello World!',
+}
+
+service { 'nginx':
+  ensure  => running,
+  require => Package['nginx'],
+}
